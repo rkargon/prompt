@@ -1,4 +1,7 @@
 import sys
+import re
+
+from directives import directives
 
 
 class ParseTree:
@@ -55,19 +58,27 @@ class ParseTree:
         self._children[-1].pretty_print(prefix + "     ", root=True)
 
 
-class UnmatchedDelimitersError(Exception):
+class ParseError(Exception):
+    """
+    Thrown then where is some error in parsing the prompt
+    """
+    pass
+
+
+class UnmatchedDelimitersError(ParseError):
     """
     Thrown when the delimiters in an expression are unmatched
     """
     pass
 
-class DirectiveExpansionException(Exception):
+
+class DirectiveExpansionException(ParseError):
     """
     Thrown when a directive fails to expand.
-    When parsing nested expressions, if an inner expression fails then the outer one will simply return ""
+    When parsing nested expressions, this exception is caught.
+    If an inner expression fails then the outer one will simply return ""
     """
     pass
-
 
 
 def main(argv):
@@ -80,9 +91,9 @@ def main(argv):
 
 def parse(pattern):
     parse_tree = generate_parse_tree(pattern)
-    parse_tree.pretty_print()
     out_str = expand_directives(parse_tree)
     return out_str
+
 
 def generate_parse_tree(pattern):
     """
@@ -114,6 +125,7 @@ def generate_parse_tree(pattern):
         raise UnmatchedDelimitersError('Too many opening delimiters in pattern "%s"' % pattern)
     return root
 
+
 def expand_directives(parse_tree):
     if parse_tree.string:
         return parse_tree.string
@@ -126,8 +138,23 @@ def expand_directives(parse_tree):
             return ""
         return evaluate_directive(out_str)
 
-def evaluate_directive(out_str):
-    return "[[" + out_str + "]]"
+
+def evaluate_directive(directive):
+    directive_regex = r"([^:]+)(?::([^:]+))?"
+    m = re.match(directive_regex, directive)
+    if m is None:
+        return directive
+    else:
+        [name, attribute] = m.groups()
+    try:
+        output = directives[name](attribute)
+    except KeyError:
+        return directive
+    except Exception as e:
+        raise DirectiveExpansionException(e.message)
+    else:
+        return str(output)
+
 
 def usage():
     print "prompt.py <pattern>"
