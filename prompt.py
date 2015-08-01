@@ -25,6 +25,9 @@ class ParseTree:
         self._children.append(subtree)
         return subtree
 
+    def children(self):
+        return self._children
+
     def pretty_print(self, prefix=None, root=False):
         """
         Prints a representation of this tree.
@@ -58,6 +61,13 @@ class UnmatchedDelimitersError(Exception):
     """
     pass
 
+class DirectiveExpansionException(Exception):
+    """
+    Thrown when a directive fails to expand.
+    When parsing nested expressions, if an inner expression fails then the outer one will simply return ""
+    """
+    pass
+
 
 
 def main(argv):
@@ -70,8 +80,9 @@ def main(argv):
 
 def parse(pattern):
     parse_tree = generate_parse_tree(pattern)
+    parse_tree.pretty_print()
     out_str = expand_directives(parse_tree)
-    return pattern
+    return out_str
 
 def generate_parse_tree(pattern):
     """
@@ -103,10 +114,20 @@ def generate_parse_tree(pattern):
         raise UnmatchedDelimitersError('Too many opening delimiters in pattern "%s"' % pattern)
     return root
 
-
 def expand_directives(parse_tree):
-    pass
+    if parse_tree.string:
+        return parse_tree.string
+    else:
+        out_str = ""
+        try:
+            for c in parse_tree.children():
+                out_str += expand_directives(c)
+        except DirectiveExpansionException:
+            return ""
+        return evaluate_directive(out_str)
 
+def evaluate_directive(out_str):
+    return "[[" + out_str + "]]"
 
 def usage():
     print "prompt.py <pattern>"
