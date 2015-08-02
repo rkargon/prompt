@@ -2,6 +2,7 @@ import sys
 import re
 
 from directives import directives
+from exc import UnmatchedDelimitersError, DirectiveExpansionException
 
 
 class ParseTree:
@@ -58,29 +59,6 @@ class ParseTree:
         self._children[-1].pretty_print(prefix + "     ", root=True)
 
 
-class ParseError(Exception):
-    """
-    Thrown then where is some error in parsing the prompt
-    """
-    pass
-
-
-class UnmatchedDelimitersError(ParseError):
-    """
-    Thrown when the delimiters in an expression are unmatched
-    """
-    pass
-
-
-class DirectiveExpansionException(ParseError):
-    """
-    Thrown when a directive fails to expand.
-    When parsing nested expressions, this exception is caught.
-    If an inner expression fails then the outer one will simply return ""
-    """
-    pass
-
-
 def main(argv):
     if len(argv) != 2:
         return usage()
@@ -91,7 +69,7 @@ def main(argv):
 
 def parse(pattern):
     parse_tree = generate_parse_tree(pattern)
-    out_str = expand_directives(parse_tree)
+    out_str = expand_directives(parse_tree) + "\033[0m"
     return out_str
 
 
@@ -150,8 +128,6 @@ def evaluate_directive(directive):
         output = directives[name](attribute)
     except KeyError:
         return directive
-    except Exception as e:
-        raise DirectiveExpansionException(e.message)
     else:
         return str(output)
 
