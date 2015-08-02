@@ -1,8 +1,7 @@
 import sys
 import re
-
 from directives import directives
-from exc import UnmatchedDelimitersError, DirectiveExpansionException
+from exc import DirectiveExpansionException, UnmatchedDelimitersError
 
 
 class ParseTree:
@@ -60,9 +59,9 @@ class ParseTree:
 
 
 def main(argv):
-    if len(argv) != 2:
-        return usage()
-    pattern = argv[1]
+    pattern = ""
+    if len(argv) >= 2:
+        pattern = argv[1]
     prompt = parse(pattern)
     sys.stdout.write(prompt)
 

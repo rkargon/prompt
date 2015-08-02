@@ -2,7 +2,6 @@ from datetime import datetime
 import os
 from subprocess import CalledProcessError
 from exc import DirectiveExpansionException
-
 from version_control import branch, status
 
 

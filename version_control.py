@@ -21,4 +21,3 @@ def status():
     if status_out:
         status_symbol = "!"
     return status_symbol
-
