@@ -1,10 +1,10 @@
-# **terminal-prompt**
+# **prompt**
 
 Add all sorts of useful info to your terminal's prompt:
 
     rkargon at (master) on [terminal-prompt] $ _
 
-Use simple directives to tell terminal-prompt what to do:
+Use simple directives to tell the prompt what to do:
 
     {user} at ({branch}) on [{repo}] $
     
