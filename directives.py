@@ -23,6 +23,8 @@ def color_directive(attribute):
         return "\033[36m"
     elif attribute == "white":
         return "\033[37m"
+    elif attribute == "reset":
+        return "\033[0m"
     else:
         raise DirectiveExpansionException('Invalid color attribute "%s"' % attribute)
 
@@ -42,6 +44,7 @@ def branch_directive(attribute):
         raise DirectiveExpansionException(e.message)
 
 directives = {
+    'col': color_directive,
     'date': date_directive,
     'user': user_directive,
     'branch': branch_directive,

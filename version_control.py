@@ -7,4 +7,4 @@ def branch():
         branch_name = check_output(['git', 'rev-parse', '--abbrev-ref', '@'], stderr=subprocess.STDOUT)
     except CalledProcessError as e:
         branch_name = check_output(['hg', 'branch'], stderr=subprocess.STDOUT)
-    return branch_name
+    return branch_name.strip()
