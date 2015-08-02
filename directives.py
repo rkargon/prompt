@@ -3,7 +3,7 @@ import os
 from subprocess import CalledProcessError
 from exc import DirectiveExpansionException
 
-from version_control import branch
+from version_control import branch, status
 
 
 def color_directive(attribute):
@@ -43,9 +43,17 @@ def branch_directive(attribute):
     except CalledProcessError as e:
         raise DirectiveExpansionException(e.message)
 
+
+def status_directive(attribute):
+    try:
+        return status()
+    except CalledProcessError as e:
+        raise DirectiveExpansionException(e.message)
+
 directives = {
     'col': color_directive,
     'date': date_directive,
     'user': user_directive,
     'branch': branch_directive,
+    'status': status_directive,
 }
