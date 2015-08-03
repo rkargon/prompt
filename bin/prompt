@@ -1,0 +1,7 @@
+#!/user/local/bin/python
+import sys
+
+from prompt import prompt
+
+if __name__ == '__main__':
+    prompt.main(sys.argv)

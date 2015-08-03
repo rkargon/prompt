@@ -8,4 +8,5 @@ setup(name='prompt',
       author='Raphael Kargon',
       author_email='raphael.kargon@gmail.net',
       url='https://github.com/rkargon/prompt',
-      packages=['prompt'])
+      packages=['prompt'],
+      scripts=['bin/prompt'])
