@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import socket
 from subprocess import CalledProcessError
 from exc import DirectiveExpansionException
 from version_control import branch, status
@@ -32,8 +33,16 @@ def date_directive(attribute):
     return datetime.now()
 
 
+def host_directive(attribute):
+    return socket.gethostname()
+
+
 def user_directive(attribute):
     return os.environ['USER']
+
+
+def working_dir_directive(attribute):
+    return os.path.basename(os.getcwd())
 
 
 def branch_directive(attribute):
@@ -52,7 +61,9 @@ def status_directive(attribute):
 directives = {
     'col': color_directive,
     'date': date_directive,
+    'host': host_directive,
     'user': user_directive,
+    'cwd': working_dir_directive,
     'branch': branch_directive,
     'status': status_directive,
 }

@@ -68,7 +68,9 @@ def main(argv):
 
 def parse(pattern):
     parse_tree = generate_parse_tree(pattern)
-    out_str = expand_directives(parse_tree) + "\033[0m"
+    # Don't parse root directly, because otherwise it would be treated as if the whole string were enclosed in {}, and
+    # any failing directive would cause the whole pattern to produce an empty string.
+    out_str = "".join(expand_directives(c) for c in parse_tree.children()) + "\033[0m"
     return out_str
 
 
@@ -111,9 +113,9 @@ def expand_directives(parse_tree):
         try:
             for c in parse_tree.children():
                 out_str += expand_directives(c)
+            return evaluate_directive(out_str)
         except DirectiveExpansionException:
             return ""
-        return evaluate_directive(out_str)
 
 
 def evaluate_directive(directive):

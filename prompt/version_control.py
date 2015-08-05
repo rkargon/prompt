@@ -13,9 +13,9 @@ def branch():
 def status():
     try:
         status_out = check_output(['git',  'diff-index',  '--name-status',  '@', '--ignore-submodules'],
-                              stderr=subprocess.STDOUT)
+                                  stderr=subprocess.STDOUT)
     except CalledProcessError:
-        status_out = check_output(['hg', 'status'])
+        status_out = check_output(['hg', 'status'], stderr=subprocess.STDOUT)
 
     status_symbol = ""
     if status_out:
