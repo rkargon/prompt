@@ -70,7 +70,14 @@ def parse(pattern):
     parse_tree = generate_parse_tree(pattern)
     # Don't parse root directly, because otherwise it would be treated as if the whole string were enclosed in {}, and
     # any failing directive would cause the whole pattern to produce an empty string.
-    out_str = "".join(expand_directives(c) for c in parse_tree.children()) + "\033[0m"
+    out_str = ""
+    for c in parse_tree.children():
+        try:
+            out_str += expand_directives(c)
+        except DirectiveExpansionException:
+            continue
+    # reset colors at end of pattern
+    out_str += "\033[0m"
     return out_str
 
 
@@ -110,12 +117,9 @@ def expand_directives(parse_tree):
         return parse_tree.string
     else:
         out_str = ""
-        try:
-            for c in parse_tree.children():
-                out_str += expand_directives(c)
-            return evaluate_directive(out_str)
-        except DirectiveExpansionException:
-            return ""
+        for c in parse_tree.children():
+            out_str += expand_directives(c)
+        return evaluate_directive(out_str)
 
 
 def evaluate_directive(directive):
