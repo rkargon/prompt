@@ -1,3 +1,4 @@
+import os
 from subprocess import check_output, CalledProcessError
 import subprocess
 
@@ -8,6 +9,14 @@ def branch():
     except CalledProcessError:
         branch_name = check_output(['hg', 'branch'], stderr=subprocess.STDOUT)
     return branch_name.strip()
+
+
+def repository():
+    try:
+        repo_dir = check_output(['git', 'rev-parse', '--show-toplevel'], stderr=subprocess.STDOUT)
+    except CalledProcessError:
+        repo_dir = check_output(['hg', 'root'], stderr=subprocess.STDOUT)
+    return os.path.basename(repo_dir).strip()
 
 
 def status():

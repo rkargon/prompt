@@ -3,7 +3,7 @@ import os
 import socket
 from subprocess import CalledProcessError
 from exc import DirectiveExpansionException
-from version_control import branch, status
+from version_control import branch, status, repository
 
 
 def color_directive(attribute):
@@ -52,6 +52,16 @@ def branch_directive(attribute):
         raise DirectiveExpansionException(e.message)
 
 
+def repo_directive(attribute):
+    """
+    Returns the name of the repository's root directory.
+    """
+    try:
+        return repository()
+    except CalledProcessError as e:
+        raise DirectiveExpansionException(e.message)
+
+
 def status_directive(attribute):
     try:
         return status()
@@ -65,5 +75,6 @@ directives = {
     'user': user_directive,
     'cwd': working_dir_directive,
     'branch': branch_directive,
+    'repo': repo_directive,
     'status': status_directive,
 }
