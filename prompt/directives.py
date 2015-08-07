@@ -6,53 +6,54 @@ from exc import DirectiveExpansionException
 from version_control import branch, status, repository
 
 
-def color_directive(attribute):
-    if attribute == "black":
+def color_directive(args):
+    colname = args[0]
+    if colname == "black":
         return "\033[30m"
-    elif attribute == "red":
+    elif colname == "red":
         return "\033[31m"
-    elif attribute == "green":
+    elif colname == "green":
         return "\033[32m"
-    elif attribute == "yellow":
+    elif colname == "yellow":
         return "\033[33m"
-    elif attribute == "blue":
+    elif colname == "blue":
         return "\033[34m"
-    elif attribute == "magenta":
+    elif colname == "magenta":
         return "\033[35m"
-    elif attribute == "cyan":
+    elif colname == "cyan":
         return "\033[36m"
-    elif attribute == "white":
+    elif colname == "white":
         return "\033[37m"
-    elif attribute == "reset":
+    elif colname == "reset":
         return "\033[0m"
     else:
-        raise DirectiveExpansionException('Invalid color attribute "%s"' % attribute)
+        raise DirectiveExpansionException('Invalid color attribute "%s"' % colname)
 
 
-def date_directive(attribute):
+def date_directive(args):
     return datetime.now()
 
 
-def host_directive(attribute):
+def host_directive(args):
     return socket.gethostname()
 
 
-def user_directive(attribute):
+def user_directive(args):
     return os.environ['USER']
 
 
-def working_dir_directive(attribute):
+def working_dir_directive(args):
     return os.path.basename(os.getcwd())
 
 
-def branch_directive(attribute):
+def branch_directive(args):
     try:
         return branch()
     except CalledProcessError as e:
         raise DirectiveExpansionException(e.message)
 
 
-def repo_directive(attribute):
+def repo_directive(args):
     """
     Returns the name of the repository's root directory.
     """
@@ -62,7 +63,7 @@ def repo_directive(attribute):
         raise DirectiveExpansionException(e.message)
 
 
-def status_directive(attribute):
+def status_directive(args):
     try:
         return status()
     except CalledProcessError as e:
