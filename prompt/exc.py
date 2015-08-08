@@ -19,3 +19,10 @@ class DirectiveExpansionException(ParseError):
     If an inner expression fails then the outer one will simply return ""
     """
     pass
+
+
+class NoRepositoryError(DirectiveExpansionException):
+    """
+    Thrown when a vcs command is parsed, but the current directory is not part of a version control repo.
+    """
+    pass

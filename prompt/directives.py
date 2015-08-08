@@ -4,10 +4,9 @@ import socket
 from subprocess import CalledProcessError
 import re
 from exc import DirectiveExpansionException
-from version_control import branch, status, repository
 
 
-def color_directive(args):
+def color_directive(**kwargs):
     commands = {
         'reset': 0,
 
@@ -43,6 +42,7 @@ def color_directive(args):
     }
     
     out_text = ""
+    args = kwargs['args']
     for arg in args:
         if arg in commands:
             out_text += "\033[%dm" % commands[arg]
@@ -53,38 +53,40 @@ def color_directive(args):
     return out_text
 
 
-def date_directive(args):
+def date_directive(**kwargs):
     return datetime.now()
 
 
-def host_directive(args):
+def host_directive(**kwargs):
     return socket.gethostname()
 
 
-def user_directive(args):
+def user_directive(**kwargs):
     return os.environ['USER']
 
 
-def working_dir_directive(args):
+def working_dir_directive(**kwargs):
     cwd = os.getcwd()
+    args = kwargs['args']
     if args and args[0] == 'short':
         cwd = os.path.basename(cwd)
     return cwd
 
 
-def branch_directive(args):
+def branch_directive(**kwargs):
     try:
-        return branch()
+        return kwargs['vcs'].branch()
     except CalledProcessError as e:
         raise DirectiveExpansionException(e.message)
 
 
-def repo_directive(args):
+def repo_directive(**kwargs):
     """
     Returns the name of the repository's root directory.
     """
     try:
-        reponame = repository()
+        reponame = kwargs['vcs'].repository()
+        args = kwargs['args']
         if args and args[0] == 'short':
             reponame = os.path.basename(reponame)
         return reponame
@@ -92,9 +94,9 @@ def repo_directive(args):
         raise DirectiveExpansionException(e.message)
 
 
-def status_directive(args):
+def status_directive(**kwargs):
     try:
-        return status()
+        return kwargs['vcs'].status()
     except CalledProcessError as e:
         raise DirectiveExpansionException(e.message)
 
