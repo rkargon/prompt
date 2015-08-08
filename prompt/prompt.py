@@ -123,13 +123,13 @@ def expand_directives(parse_tree):
 
 
 def evaluate_directive(directive):
-    directive_regex = r"([^:]+)((?::([^:]+))*)"
+    directive_regex = r"([^|]+)((?:\|([^|]+))*)"
     m = re.match(directive_regex, directive)
     if m is None:
         return directive
     else:
         name = m.group(1)
-        args = m.group(2).split(":")
+        args = m.group(2).split("|")
         args = filter(None, args)
     try:
         output = directives[name](args)
