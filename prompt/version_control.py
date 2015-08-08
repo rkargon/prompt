@@ -16,7 +16,7 @@ def repository():
         repo_dir = check_output(['git', 'rev-parse', '--show-toplevel'], stderr=subprocess.STDOUT)
     except CalledProcessError:
         repo_dir = check_output(['hg', 'root'], stderr=subprocess.STDOUT)
-    return os.path.basename(repo_dir).strip()
+    return repo_dir.strip()
 
 
 def status():

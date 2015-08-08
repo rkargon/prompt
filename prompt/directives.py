@@ -2,32 +2,55 @@ from datetime import datetime
 import os
 import socket
 from subprocess import CalledProcessError
+import re
 from exc import DirectiveExpansionException
 from version_control import branch, status, repository
 
 
 def color_directive(args):
-    colname = args[0]
-    if colname == "black":
-        return "\033[30m"
-    elif colname == "red":
-        return "\033[31m"
-    elif colname == "green":
-        return "\033[32m"
-    elif colname == "yellow":
-        return "\033[33m"
-    elif colname == "blue":
-        return "\033[34m"
-    elif colname == "magenta":
-        return "\033[35m"
-    elif colname == "cyan":
-        return "\033[36m"
-    elif colname == "white":
-        return "\033[37m"
-    elif colname == "reset":
-        return "\033[0m"
-    else:
-        raise DirectiveExpansionException('Invalid color attribute "%s"' % colname)
+    commands = {
+        'reset': 0,
+
+        # text styles
+        'bold': 1,
+        'italic': 3,
+        'underline': 4,
+        'bold_off': 22,
+        'italic_off': 23,
+        'underline_off': 24,
+
+        # foreground (text) colors
+        'black': 30,
+        'red': 31,
+        'green': 32,
+        'yellow': 33,
+        'blue': 34,
+        'magenta': 35,
+        'cyan': 36,
+        'white': 37,
+        'fg_reset': 39,
+
+        # background colors
+        'bg_black': 40,
+        'bg_red': 41,
+        'bg_green': 42,
+        'bg_yellow': 43,
+        'bg_blue': 44,
+        'bg_magenta': 45,
+        'bg_cyan': 46,
+        'bg_white': 47,
+        'bg_reset': 49,
+    }
+    
+    out_text = ""
+    for arg in args:
+        if arg in commands:
+            out_text += "\033[%dm" % commands[arg]
+        elif re.match('[34]8;(?:2;\d+;\d+;\d+|5;\d+)', arg):
+            print "make some noooooiissseee!"
+            out_text += "\033[%sm" % arg
+
+    return out_text
 
 
 def date_directive(args):
@@ -43,7 +66,10 @@ def user_directive(args):
 
 
 def working_dir_directive(args):
-    return os.path.basename(os.getcwd())
+    cwd = os.getcwd()
+    if args and args[0] == 'short':
+        cwd = os.path.basename(cwd)
+    return cwd
 
 
 def branch_directive(args):
@@ -58,7 +84,10 @@ def repo_directive(args):
     Returns the name of the repository's root directory.
     """
     try:
-        return repository()
+        reponame = repository()
+        if args and args[0] == 'short':
+            reponame = os.path.basename(reponame)
+        return reponame
     except CalledProcessError as e:
         raise DirectiveExpansionException(e.message)
 
