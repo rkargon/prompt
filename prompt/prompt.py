@@ -1,3 +1,4 @@
+import os
 import sys
 import re
 
@@ -9,9 +10,6 @@ from version_control import VersionControlProxy
 
 class Prompt:
     def __init__(self):
-        # cachename = "~/.promptcache"
-        # cachefile = open(cachename, "r+")
-        # prev_vcs_root, vcs_name = cachefile.readlines()[:2]
         self.vcs = VersionControlProxy()
 
     def parse(self, pattern):

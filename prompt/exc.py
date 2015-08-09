@@ -21,8 +21,16 @@ class DirectiveExpansionException(ParseError):
     pass
 
 
-class NoRepositoryError(DirectiveExpansionException):
+class NoRepositoryException(DirectiveExpansionException):
     """
     Thrown when a vcs command is parsed, but the current directory is not part of a version control repo.
+    """
+    pass
+
+
+class VCSModuleMissingException(DirectiveExpansionException):
+    """
+    Thrown when the modules for a certain VCS system could not be loaded.
+    (e.g. if mercurial is not installed on a system)
     """
     pass

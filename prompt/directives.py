@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 import socket
-from subprocess import CalledProcessError
 import re
 from exc import DirectiveExpansionException
 
@@ -74,31 +73,22 @@ def working_dir_directive(**kwargs):
 
 
 def branch_directive(**kwargs):
-    try:
-        return kwargs['vcs'].branch()
-    except CalledProcessError as e:
-        raise DirectiveExpansionException(e.message)
+    return kwargs['vcs'].branch()
 
 
 def repo_directive(**kwargs):
     """
     Returns the name of the repository's root directory.
     """
-    try:
-        reponame = kwargs['vcs'].repository()
-        args = kwargs['args']
-        if args and args[0] == 'short':
-            reponame = os.path.basename(reponame)
-        return reponame
-    except CalledProcessError as e:
-        raise DirectiveExpansionException(e.message)
+    reponame = kwargs['vcs'].repository()
+    args = kwargs['args']
+    if args and args[0] == 'short':
+        reponame = os.path.basename(reponame)
+    return reponame
 
 
 def status_directive(**kwargs):
-    try:
-        return kwargs['vcs'].status()
-    except CalledProcessError as e:
-        raise DirectiveExpansionException(e.message)
+    return kwargs['vcs'].status()
 
 directives = {
     'col': color_directive,
