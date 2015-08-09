@@ -3,7 +3,6 @@ Contains methods for dealing with version control systems.
 """
 from subprocess import check_output, CalledProcessError
 import subprocess
-from mercurial.error import RepoError
 import sys
 
 from exc import NoRepositoryException, VCSModuleMissingException
@@ -12,13 +11,14 @@ from exc import NoRepositoryException, VCSModuleMissingException
 class Mercurial:
     def __init__(self):
         try:
-            if 'mercurial' in sys.modules:
-                from mercurial import ui, hg
-            else:
-                raise VCSModuleMissingException('Could not load mercurial module.')
-            self.repo = hg.repository(ui.ui(), '.')
-        except RepoError as rep_err:
-            raise NoRepositoryException(rep_err.message)
+            from mercurial import ui, hg, error
+        except ImportError:
+            raise VCSModuleMissingException('Could not load mercurial module.')
+        else:
+            try:
+                self.repo = hg.repository(ui.ui(), '.')
+            except error.RepoError as rep_err:
+                raise NoRepositoryException(rep_err.message)
 
     def branch(self):
         branch_name = self.repo.dirstate.branch()
@@ -77,7 +77,7 @@ class VersionControlProxy:
         for vcs in [Git, Mercurial]:
             try:
                 self.current_vcs = vcs()
-            except NoRepositoryException:
+            except (NoRepositoryException, VCSModuleMissingException):
                 continue
             else:
                 return

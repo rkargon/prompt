@@ -55,6 +55,7 @@ Patterns are enclosed with braces, like `{this}`. Attributes can be added to a p
 - `{date}` Displays the current date and time.
 - `{host}` Displays the current host machine.
 - `{user}` Displays the current user. 
+- `{virtualenv}` Displays the current virtualenv (If virtualenv is not enabled, no text is returned.) Usually not necessary, as virtualenv adds its own prefix to the prompt string.
 - `{branch}` Displays the current version-control repository's branch.
 - `{repo}` Displays the name of this repository's local root directory. Use `|short` to get only the directory name and not the full path.
 - `{status}` If the current repository contains uncommited change, `!` is displayed. Otherwise, this pattern produces no output. 

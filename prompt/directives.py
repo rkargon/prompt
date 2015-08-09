@@ -46,7 +46,6 @@ def color_directive(**kwargs):
         if arg in commands:
             out_text += "\033[%dm" % commands[arg]
         elif re.match('[34]8;(?:2;\d+;\d+;\d+|5;\d+)', arg):
-            print "make some noooooiissseee!"
             out_text += "\033[%sm" % arg
 
     return out_text
@@ -62,6 +61,13 @@ def host_directive(**kwargs):
 
 def user_directive(**kwargs):
     return os.environ['USER']
+
+
+def virtualenv_directive(**kwargs):
+    try:
+        return os.path.basename(os.environ['VIRTUAL_ENV'])
+    except KeyError:
+        raise DirectiveExpansionException('No current virtualenv')
 
 
 def working_dir_directive(**kwargs):
@@ -92,10 +98,12 @@ def status_directive(**kwargs):
 
 directives = {
     'col': color_directive,
+    'cwd': working_dir_directive,
     'date': date_directive,
     'host': host_directive,
     'user': user_directive,
-    'cwd': working_dir_directive,
+    'virtualenv': virtualenv_directive,
+    #version control
     'branch': branch_directive,
     'repo': repo_directive,
     'status': status_directive,
