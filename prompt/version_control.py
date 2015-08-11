@@ -1,6 +1,7 @@
 """
 Contains methods for dealing with version control systems.
 """
+import os
 from subprocess import check_output, CalledProcessError
 import subprocess
 import sys
@@ -11,12 +12,13 @@ from exc import NoRepositoryException, VCSModuleMissingException
 class Mercurial:
     def __init__(self):
         try:
-            from mercurial import ui, hg, error
+            from mercurial import ui, hg, error, cmdutil
         except ImportError:
             raise VCSModuleMissingException('Could not load mercurial module.')
         else:
             try:
-                self.repo = hg.repository(ui.ui(), '.')
+                repo_path = cmdutil.findrepo(os.getcwd())
+                self.repo = hg.repository(ui.ui(), repo_path)
             except error.RepoError as rep_err:
                 raise NoRepositoryException(rep_err.message)
 
