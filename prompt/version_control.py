@@ -16,11 +16,10 @@ class Mercurial:
         except ImportError:
             raise VCSModuleMissingException('Could not load mercurial module.')
         else:
-            try:
-                repo_path = cmdutil.findrepo(os.getcwd())
-                self.repo = hg.repository(ui.ui(), repo_path)
-            except error.RepoError as rep_err:
-                raise NoRepositoryException(rep_err.message)
+            repo_path = cmdutil.findrepo(os.getcwd())
+            if repo_path is None:
+                raise NoRepositoryException('no repo found')
+            self.repo = hg.repository(ui.ui(), repo_path)
 
     def branch(self):
         branch_name = self.repo.dirstate.branch()
