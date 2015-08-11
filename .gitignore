@@ -1,2 +1,9 @@
+# ignore dotfiles, except gitignore
 .*
 !/.gitignore
+
+# python
+*.pyc
+
+# ignore build directory
+build/*
