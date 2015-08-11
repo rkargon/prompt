@@ -30,13 +30,12 @@ class Mercurial:
 
     def status(self):
         # Fields are: modified, added, removed, deleted, unknown, ignored, clean
-        status = self.repo.status()
+        status = self.repo.status(ignored=True, unknown=True)
+        status_symbol = ""
         if status.modified or status.added or status.removed or status.deleted:
-            status_symbol = "!"
-        elif status.unknown:
-            status_symbol = "?"
-        else:
-            status_symbol = ""
+            status_symbol += "!"
+        if status.unknown:
+            status_symbol += "?"
         return status_symbol
 
 
@@ -56,9 +55,24 @@ class Git:
         return repo_dir.strip()
 
     def status(self):
-        status_out = check_output(['git', 'diff-index', '--name-status', '@', '--ignore-submodules'],
+        status_out = check_output(['git', 'status', '--porcelain'],
                                   stderr=subprocess.STDOUT)
-        status_symbol = "!" if status_out else ""
+        lines = status_out.split('\n')
+
+        # count untracked and tracked changes
+        untracked = tracked = 0
+        for l in filter(len, lines):
+            if l[0] == "?":
+                untracked+= 1
+            elif l[0] == "M" or l[1] == "M":
+                tracked += 1
+        status_symbol = ""
+
+        # ! for tracked changes, ? for untracked changes.
+        if tracked:
+            status_symbol += "!"
+        if untracked:
+            status_symbol += "?"
         return status_symbol
 
 
