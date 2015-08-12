@@ -23,7 +23,7 @@ class Prompt:
             except DirectiveExpansionException:
                 continue
         # reset colors at end of pattern
-        # out_str += "\033[0m"
+        out_str += "\[\033[0m\]"
         return out_str
 
     def expand_directives(self, parse_tree):
