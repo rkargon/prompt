@@ -30,16 +30,34 @@ To test **prompt**, use the `prompt` command with a pattern of your choosing.
 
 To actually modify your terminal prompt, you will need to edit the `PS1` environment variable in your terminal. Add the following code to your `~/.bash_profile`:
 
-    # run prompt, and pipe errors to /dev/null
+	# run prompt, and pipe errors to /dev/null
 	prompt_ps1() {
-	    prompt "{ [{col|blue}{branch}{col|reset}{col|red}{status}{col|reset}]}$" 2> /dev/null
+	    prompt "your prompt here" 2> /dev/null
 	}
 	
-	PS1='$(prompt_ps1)'
+	PS1 = '$(prompt_ps1)'
 
-This will set your prompt variable at startup to use **prompt**. Use the `source` command to refresh your terminal and see these changes. 
+This will set your prompt variable at startup to use **prompt**. Use the `source` command to refresh your terminal and see these changes. If you would like to use color codes, an extra step is necessary to properly scape color codes and fix text wrapping in the terminal:
+
+    # run prompt, and pipe errors to /dev/null
+	prompt_ps1() {
+	    prompt -e "your prompt here" 2> /dev/null
+	}
+	
+	# function to set the prompt
+	set_bash_prompt(){
+		PS1="$(prompt_ps1)"
+    }
+
+	# call set_bash_prompt each time before the bash prompt is shown.
+    PROMPT_COMMAND=set_bash_prompt
+
+The `-e` flag surrounds color codes in `\[` and `\]` so that the terminal can properly wrap text. When passed to `PS1`, bash escapes them and makes them invisible. 
 
 ## Documentation
+
+### Command Line Arguments
+ 1. `--escape-colors` or `-e`  --- The  `-e` flag escapes color codes with `\[` and `\]`, for use in bash prompts, to make text wrap correctly in terminal. 
 
 ### Syntax
 Patterns are enclosed with braces, like `{this}`. Attributes can be added to a pattern, by appending pipes: `{pattern|arg1|arg2|arg3}`.  If the text in the braces is not a valid pattern, it is simply returned unchanged. For instance, `{some text}` would return `some text`.  This allows you to nest patterns. Why would you want to do this? Some patterns are not always valid, depending on the state of your environment. For instance, `{branch}` doesn't make much sense when you're not in a repository. When a pattern fails, all the enclosing patterns will return an empty string. Thus, the pattern `{user}{on {branch}}$ ` can produce either `rkargon on master$ `, or `rkargon$ `,  depending on the situation. 

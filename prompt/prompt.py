@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import re
@@ -24,6 +25,7 @@ class Prompt:
                 continue
         # reset colors at end of pattern
         out_str += "\[\033[0m\]"
+
         return out_str
 
     def expand_directives(self, parse_tree):
@@ -53,11 +55,16 @@ class Prompt:
 
 
 def main(argv):
+    parser = argparse.ArgumentParser(description='A tool for customizing terminal prompts')
+    parser.add_argument('--escape-colors', dest='escape_colors', action='store_const', const=True, default=False,
+                        help='Escape colors codes with \[ and \] to help text wrapping. '
+                             'Used when passing prompt output to PS1')
+    parser.add_argument('pattern', metavar='pattern', type=str, help='The pattern for prompt to expand.')
+    args = parser.parse_args()
+    escape_colors = args.escape_colors
+    pattern = args.pattern
+    
     prompt = Prompt()
-    if len(argv) >= 2:
-        pattern = argv[1]
-    else:
-        return usage()
     prompt_text = prompt.parse(pattern)
     sys.stdout.write(prompt_text)
 
