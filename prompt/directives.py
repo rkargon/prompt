@@ -44,10 +44,12 @@ def color_directive(**kwargs):
     args = kwargs['args']
     for arg in args:
         if arg in commands:
-            out_text += "\[\033[%dm\]" % commands[arg]
+            out_text += "\033[%dm" % commands[arg]
         elif re.match('[34]8;(?:2;\d+;\d+;\d+|5;\d+)', arg):
-            out_text += "\[\033[%sm\]" % arg
+            out_text += "\033[%sm" % arg
 
+    if kwargs['escape_colors']:
+        out_text = '\[' + out_text + '\]'
     return out_text
 
 

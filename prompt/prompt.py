@@ -10,7 +10,8 @@ from version_control import VersionControlProxy
 
 
 class Prompt:
-    def __init__(self):
+    def __init__(self, escape_colors=False):
+        self.escape_colors=escape_colors
         self.vcs = VersionControlProxy()
 
     def parse(self, pattern):
@@ -23,8 +24,6 @@ class Prompt:
                 out_str += self.expand_directives(c)
             except DirectiveExpansionException:
                 continue
-        # reset colors at end of pattern
-        out_str += "\[\033[0m\]"
 
         return out_str
 
@@ -47,7 +46,7 @@ class Prompt:
             args = m.group(2).split("|")
             args = filter(None, args)
         try:
-            output = directives[name](args=args, vcs=self.vcs)
+            output = directives[name](args=args, vcs=self.vcs, escape_colors=self.escape_colors)
         except KeyError:
             return directive
         else:
@@ -56,15 +55,17 @@ class Prompt:
 
 def main(argv):
     parser = argparse.ArgumentParser(description='A tool for customizing terminal prompts')
-    parser.add_argument('--escape-colors', dest='escape_colors', action='store_const', const=True, default=False,
+    parser.add_argument('-e', '--escape-colors', dest='escape_colors', action='store_const', const=True, default=False,
                         help='Escape colors codes with \[ and \] to help text wrapping. '
                              'Used when passing prompt output to PS1')
     parser.add_argument('pattern', metavar='pattern', type=str, help='The pattern for prompt to expand.')
     args = parser.parse_args()
     escape_colors = args.escape_colors
     pattern = args.pattern
-    
-    prompt = Prompt()
+    # reset text color after prompt is finished.
+    pattern += '{col|reset}'
+
+    prompt = Prompt(escape_colors=escape_colors)
     prompt_text = prompt.parse(pattern)
     sys.stdout.write(prompt_text)
 

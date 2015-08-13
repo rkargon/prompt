@@ -5,7 +5,7 @@ This tool allows you to easily customize your terminal's prompt to display all s
 **prompt** replaces patterns enclosed in curly braces `{`, `}` with information about the current environment:
 The pattern
 
-    {user} at ({branch}) on [{repo}] $
+    {user} at ({branch}) on [{repo|short}] $
     
 becomes 
 
@@ -13,7 +13,7 @@ becomes
 
 Colors can also be inserted into the prompt, taking care of ANSI color codes for you:
 
-    {host}:{cwd} {col|red}{user}{col|reset}$
+    {host}:{cwd|short} {col|red}{user}{col|reset}$
     
 ## Installation
 Download the repository, using:
@@ -58,6 +58,7 @@ The `-e` flag surrounds color codes in `\[` and `\]` so that the terminal can pr
 
 ### Command Line Arguments
  1. `--escape-colors` or `-e`  --- The  `-e` flag escapes color codes with `\[` and `\]`, for use in bash prompts, to make text wrap correctly in terminal. 
+ 2. `--help` or `-h` --- This outputs a usage string for prompt, that describes the various command line args. 
 
 ### Syntax
 Patterns are enclosed with braces, like `{this}`. Attributes can be added to a pattern, by appending pipes: `{pattern|arg1|arg2|arg3}`.  If the text in the braces is not a valid pattern, it is simply returned unchanged. For instance, `{some text}` would return `some text`.  This allows you to nest patterns. Why would you want to do this? Some patterns are not always valid, depending on the state of your environment. For instance, `{branch}` doesn't make much sense when you're not in a repository. When a pattern fails, all the enclosing patterns will return an empty string. Thus, the pattern `{user}{on {branch}}$ ` can produce either `rkargon on master$ `, or `rkargon$ `,  depending on the situation. 
@@ -73,7 +74,7 @@ Patterns are enclosed with braces, like `{this}`. Attributes can be added to a p
 - `{date}` Displays the current date and time.
 - `{host}` Displays the current host machine.
 - `{user}` Displays the current user. 
-- `{virtualenv}` Displays the current virtualenv (If virtualenv is not enabled, no text is returned.) Usually not necessary, as virtualenv adds its own prefix to the prompt string.
+- `{virtualenv}` Displays the current virtualenv. Usually not necessary, as virtualenv adds its own prefix to the prompt string.
 - `{branch}` Displays the current version-control repository's branch.
 - `{repo}` Displays the name of this repository's local root directory. Use `|short` to get only the directory name and not the full path.
 - `{status}` If the current repository contains tracked changes, "!" is displayed. For untracked changes, "?" is displayed. Otherwise, no output is displayed.
