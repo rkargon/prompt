@@ -9,16 +9,33 @@ import sys
 from exc import NoRepositoryException, VCSModuleMissingException
 
 
+def find_repo(p, dirname):
+    """
+    Starting at p, search for a directory named dirname.
+    If dirname is not found, move to the parent directory and search.
+
+    Basically searches if the current directory is in some sort of VCS repo.
+    """
+    while not os.path.isdir(os.path.join(p, dirname)):
+        oldp, p = p, os.path.dirname(p)
+        if p == oldp:
+            return None
+
+    return p
+
+
 class Mercurial:
     def __init__(self):
+
+        repo_path = find_repo(os.getcwd(), '.hg')
+        if repo_path is None:
+            raise NoRepositoryException('no hg repo found')
+
         try:
             from mercurial import ui, hg, error, cmdutil
         except ImportError:
             raise VCSModuleMissingException('Could not load mercurial module.')
         else:
-            repo_path = cmdutil.findrepo(os.getcwd())
-            if repo_path is None:
-                raise NoRepositoryException('no repo found')
             self.repo = hg.repository(ui.ui(), repo_path)
 
     def branch(self):
@@ -42,10 +59,9 @@ class Mercurial:
 
 class Git:
     def __init__(self):
-        try:
-            check_output(['git', 'rev-parse', '--git-dir'], stderr=subprocess.STDOUT)
-        except CalledProcessError as e:
-            raise NoRepositoryException(e.message)
+        repo_path = find_repo(os.getcwd(), '.git')
+        if repo_path is None:
+            raise NoRepositoryException('no git repo found')
 
     def branch(self):
         branch_name = check_output(['git', 'rev-parse', '--abbrev-ref', '@'], stderr=subprocess.STDOUT)
