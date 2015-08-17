@@ -81,7 +81,7 @@ class Git:
         for l in filter(len, lines):
             if l[0] == "?":
                 untracked+= 1
-            elif l[0] == "M" or l[1] == "M":
+            elif l[0] in "MARDCU" or l[1] in "MARDCU":
                 tracked += 1
         status_symbol = ""
 
